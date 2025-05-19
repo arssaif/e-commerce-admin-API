@@ -8,7 +8,7 @@ app = FastAPI(title="E-commerce Admin API")
 
 @app.get("/")
 async def root():
-    return {"message": "E-commerce Admin API up and running\n /"
+    return {"E-commerce Admin API up and running....\n /"
                        "Swagger UI: http://127.0.0.1:8000/docs\n /"
                         "ReDoc: http://127.0.0.1:8000/redoc"}
 
