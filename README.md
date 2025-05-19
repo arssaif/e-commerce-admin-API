@@ -11,7 +11,7 @@ A FastAPI back-end to power an admin dashboard for sales, revenue, and inventory
 5. Run demo data loader:  
    ```bash
    cd e-commerce-admin-API
-   python app/scriptsdemo_data.py
+   python app/scripts/load_demo_data.py
 6. Start Server
    ```bash
    cd e-commerce-admin-API
