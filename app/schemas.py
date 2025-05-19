@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from datetime import datetime
+from typing import List, Any
 
 class CategoryBase(BaseModel):
     name: str
@@ -44,3 +45,11 @@ class Sale(SaleBase):
     id: int
     product: Product
     model_config = {"from_attributes": True}
+
+class RevenueItem(BaseModel):
+    period: Any      # int for week/month/year or date for daily
+    revenue: float
+
+class RevenueCompare(BaseModel):
+    period1: List[RevenueItem]
+    period2: List[RevenueItem]

@@ -8,8 +8,8 @@ app = FastAPI(title="E-commerce Admin API")
 
 @app.get("/")
 async def root():
-    return {"E-commerce Admin API up and running....\n /"
-                       "Swagger UI: http://127.0.0.1:8000/docs\n /"
+    return {"E-commerce Admin API up and running.... | "
+                       "Swagger UI: http://127.0.0.1:8000/docs | "
                         "ReDoc: http://127.0.0.1:8000/redoc"}
 
 app.include_router(products.router)
