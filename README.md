@@ -11,7 +11,7 @@ A FastAPI back-end to power an admin dashboard for sales, revenue, and inventory
 5. Run demo data loader:  
    ```bash
    cd e-commerce-admin-API
-   python app/scriptsdemo_data.py
+   python app/scripts/load_demo_data.py
 6. Start Server
    ```bash
    cd e-commerce-admin-API
@@ -20,31 +20,31 @@ A FastAPI back-end to power an admin dashboard for sales, revenue, and inventory
 # Endpoints
 
 ## 1. Products
-•	POST /products/
+a.	POST /products/
+   - Register new product
 
-Register new product
-
-•	GET /products/?skip=0&limit=100
-
-List products
+b.	GET /products/?skip=0&limit=100
+   - List products
 
 ## 2. Sales
-•	POST /sales/
+a.	POST /sales/
+   - Record a sale
 
-Record a sale
+b.	GET /sales/?start=<ISO>&end=<ISO>[&product_id=<int>][&category_id=<int>] 
+   - Retrieve sales between two datetimes
 
-•	GET /sales/?start=<ISO>&end=<ISO>
-
-Retrieve sales between two datetimes
-
+c.	GET /sale/revenue/?start=<ISO>&end=<ISO>[&period=<daily|weekly|monthly|yearly>][&category_id=<int>]
+   - Retries revenue grouped by period (daily/weekly/monthly)
+     
+d. GET /sales/revenue/compare/?p1_start=<ISO>&p1_end=<ISO>&p2_start=<ISO>&p2_end=<ISO>[&period=<daily|weekly|monthly|yearly>][&category_id=<int>]
+   - Compare revenue for two date ranges, grouped by the given interval
+     
 ## 3. Inventory
-•	GET /inventory/
+a.	GET /inventory/
+   - View current inventory
 
-View current inventory
-
-•	PUT /inventory/{product_id}?qty=<int>
-
-Set inventory level
+b.	PUT /inventory/{product_id}?qty=<int>
+   - Set inventory level
 
 # Sample Usage
 
@@ -94,10 +94,8 @@ curl -X POST "http://127.0.0.1:8000/products/" \
 •	Path: /products/
 
 •	Query params:
-
-   o	skip (int, default 0)
-
-   o	limit (int, default 100)
+   - `skip` (int, default 0)
+   - `limit` (int, default 100)
 
 •	cURL Example:
 ```bash
@@ -184,15 +182,16 @@ curl -X POST "http://127.0.0.1:8000/sales/" \
 •	Path: /sales/
 
 •	Query params (ISO datetime):
-
-   o	start (e.g. 2025-05-01T00:00:00)
-
-   o	end (e.g. 2025-05-17T23:59:59)
+   - `start` (e.g. 2025-05-01T00:00:00)
+   - `end`   (e.g. 2025-05-17T23:59:59)
+   - `product_id` (int, optional)  
+   - `category_id` (int, optional) 
 
 •	cURL Example:
 ```bash
-curl -X GET "http://127.0.0.1:8000/sales?start=2025-05-01T00:00:00&end=2025-05-17T23:59:59" \
-  -H "Accept: application/json"
+curl -X 'GET' \
+  'http://127.0.0.1:8000/sales/?start=2025-04-19T09%3A51%3A54.333Z&end=2025-05-20T09%3A51%3A54.333Z&product_id=41&category_id=2' \
+  -H 'accept: application/json'
 ```
 •	Response (200 OK):
 ```bash
@@ -215,6 +214,67 @@ curl -X GET "http://127.0.0.1:8000/sales?start=2025-05-01T00:00:00&end=2025-05-1
   }
   // …
 ]
+```
+### c. Revenue report
+
+• Method: GET  
+• Path: `/sales/revenue/`  
+• Query params:  
+  - `start` (ISO datetime, required)  
+  - `end` (ISO datetime, required)  
+  - `period` (daily / weekly / monthly / yearly, default “daily”)  
+  - `category_id` (int, optional)  
+
+• cURL Example:  
+```bash
+curl -X GET "http://127.0.0.1:8000/sales/revenue/?\
+start=2025-04-01T00:00:00&\
+end=2025-05-31T23:59:59&\
+period=monthly&\
+category_id=2" \
+  -H "Accept: application/json"
+```
+•	Response (200 OK):
+```bash
+[
+  { "period": 4, "revenue": 19170.24 },
+  { "period": 5, "revenue": 69605.02 }
+]
+```
+
+### d. Compare revenue between two date ranges
+• Method: GET
+• Path: /sales/revenue/compare/
+• Query params:
+   - `p1_start` (ISO datetime, required)
+   - `p1_end` (ISO datetime, required)
+   - `p2_start` (ISO datetime, required)
+   - `p2_end` (ISO datetime, required)
+   - `period` (daily / weekly / monthly / yearly, default “monthly”)
+
+category_id (int, optional)
+
+• cURL Example:
+```bash
+curl -X GET "http://127.0.0.1:8000/sales/revenue/compare/?\
+p1_start=2025-04-01T00:00:00&\
+p1_end=2025-04-30T23:59:59&\
+p2_start=2025-05-01T00:00:00&\
+p2_end=2025-05-31T23:59:59&\
+period=monthly&\
+category_id=2" \
+  -H "Accept: application/json"
+```
+• Response (200 OK):
+```bash
+{
+  "period1": [
+    { "period": 4, "revenue": 19170.24 }
+  ],
+  "period2": [
+    { "period": 5, "revenue": 69605.02 }
+  ]
+}
 ```
 
 ## 3. 📦 Inventory
@@ -256,8 +316,7 @@ curl -X GET "http://127.0.0.1:8000/inventory/" \
 •	Path: /inventory/{product_id}
 
 •	Query param:
-
-   o	qty (int, new stock level)
+   - `qty` (int, new stock level)
 
 •	cURL Example:
 ```bash
